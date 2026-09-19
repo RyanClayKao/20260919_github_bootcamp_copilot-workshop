@@ -43,8 +43,8 @@ function renderTodos() {
     emptyState.textContent = todos.length === 0
       ? "還沒有任何待辦事項，新增一個吧!"
       : currentFilter === "active"
-        ? "太棒了，目前沒有未完成事項!"
-        : "目前沒有已完成事項。";
+        ? "太棒了，目前沒有未完成的事項!"
+        : "目前沒有已完成的事項，可能是被目前的篩選條件過濾掉了。";
   }
 
   visibleTodos.forEach((todo) => {
