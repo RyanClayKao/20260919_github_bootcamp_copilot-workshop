@@ -75,6 +75,7 @@ function renderTodos() {
 
   const unfinishedTodos = todos.filter((todo) => !todo.completed).length;
   remainingCount.textContent = `未完成: ${unfinishedTodos} 項`;
+  clearCompletedButton.disabled = !todos.some((todo) => todo.completed);
 }
 
 // 套用主題並更新切換按鈕的圖示與文字。
@@ -133,6 +134,11 @@ todoForm.addEventListener("submit", (event) => {
 });
 
 clearCompletedButton.addEventListener("click", () => {
+  const completedCount = todos.filter((todo) => todo.completed).length;
+  if (!completedCount || !window.confirm(`確定要清除 ${completedCount} 項已完成的待辦事項嗎？`)) {
+    return;
+  }
+
   todos = todos.filter((todo) => !todo.completed);
   saveTodos();
   renderTodos();
