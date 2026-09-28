@@ -1,4 +1,5 @@
 const STORAGE_KEY = "todo-list-items";
+const FILTER_STORAGE_KEY = "todo-filter";
 
 const todoForm = document.querySelector("#todo-form");
 const todoInput = document.querySelector("#todo-input");
@@ -12,7 +13,7 @@ const themeLabel = document.querySelector("#theme-label");
 const filterButtons = document.querySelectorAll("[data-filter]");
 
 let todos = loadTodos();
-let currentFilter = "all";
+let currentFilter = loadInitialFilter();
 
 // 從瀏覽器儲存空間讀取待辦，資料損壞時回到空清單。
 function loadTodos() {
@@ -22,6 +23,12 @@ function loadTodos() {
   } catch (error) {
     return [];
   }
+}
+
+// 讀取上次的篩選條件，無效值安全回退為全部。
+function loadInitialFilter() {
+  const savedFilter = localStorage.getItem(FILTER_STORAGE_KEY);
+  return ["all", "active", "completed"].includes(savedFilter) ? savedFilter : "all";
 }
 
 // 將目前清單保存起來，讓重新整理後仍能保留資料。
@@ -152,15 +159,21 @@ themeToggle.addEventListener("click", () => {
 
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    currentFilter = button.dataset.filter;
-    filterButtons.forEach((filterButton) => {
-      const isActive = filterButton === button;
-      filterButton.classList.toggle("active", isActive);
-      filterButton.setAttribute("aria-pressed", String(isActive));
-    });
-    renderTodos();
+    applyFilter(button.dataset.filter);
   });
 });
 
+// 套用篩選條件、同步按鈕狀態並保存使用者選擇。
+function applyFilter(filter) {
+  currentFilter = ["all", "active", "completed"].includes(filter) ? filter : "all";
+  localStorage.setItem(FILTER_STORAGE_KEY, currentFilter);
+  filterButtons.forEach((filterButton) => {
+    const isActive = filterButton.dataset.filter === currentFilter;
+    filterButton.classList.toggle("active", isActive);
+    filterButton.setAttribute("aria-pressed", String(isActive));
+  });
+  renderTodos();
+}
+
 applyTheme(loadInitialTheme());
-renderTodos();
+applyFilter(currentFilter);
